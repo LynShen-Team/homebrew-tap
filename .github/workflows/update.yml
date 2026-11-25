@@ -7,12 +7,13 @@ name: Update formula
 # Linux before it is pushed.
 #
 # GitHub never ran the hourly schedule after the repository was created
-# (2026-11-25: push and workflow_dispatch runs only); a push that changes the
-# cron line registers it again. If scheduled runs stop showing up, change the
-# minute and push.
+# (2026-11-25: push and workflow_dispatch runs only, also none at :23 after the
+# cron line was changed once); a push that changes the cron line should
+# register it again. If scheduled runs stop showing up, change the minute and
+# push. The CLI release triggers this run itself either way.
 on:
   schedule:
-    - cron: "23 * * * *"
+    - cron: "53 * * * *"
   workflow_dispatch:
   push:
     branches:
