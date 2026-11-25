@@ -5,9 +5,14 @@ name: Update formula
 # (`gh workflow run update.yml -R LynShen-Team/homebrew-tap`); the hourly run
 # catches anything missed. A new version is installed with brew on macOS and
 # Linux before it is pushed.
+#
+# GitHub never ran the hourly schedule after the repository was created
+# (2026-11-25: push and workflow_dispatch runs only); a push that changes the
+# cron line registers it again. If scheduled runs stop showing up, change the
+# minute and push.
 on:
   schedule:
-    - cron: "17 * * * *"
+    - cron: "23 * * * *"
   workflow_dispatch:
   push:
     branches:
