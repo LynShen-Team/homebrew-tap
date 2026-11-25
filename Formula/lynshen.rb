@@ -3,24 +3,24 @@
 class Lynshen < Formula
   desc "Coding agent for the terminal"
   homepage "https://github.com/LynShen-Team/Aogiri-CLI"
-  version "0.8.10"
+  version "0.8.11"
   license "Apache-2.0"
 
   on_macos do
     on_arm do
-      url "https://software.lynshen.org/cli/0.8.10/lynshen-aarch64-apple-darwin"
-      sha256 "11f7f918eb4ea8a92141c389e1388509379d0838ebe6a8f37a2785740c28c9e9"
+      url "https://software.lynshen.org/cli/0.8.11/lynshen-aarch64-apple-darwin"
+      sha256 "88289a0b78db4fff360537d5a8e3d71df49d73eba5b87640cf592fc729f40e8c"
     end
     on_intel do
-      url "https://software.lynshen.org/cli/0.8.10/lynshen-x86_64-apple-darwin"
-      sha256 "712bfd7a7e6e9e2bdd7b9323b3d2627ec5dc6140429a61c6e4a810b83cf50157"
+      url "https://software.lynshen.org/cli/0.8.11/lynshen-x86_64-apple-darwin"
+      sha256 "1ffe933c224068238af78da077e4e57237b7b9eac57fa5bc5a08e0a46d9c551a"
     end
   end
 
   on_linux do
     on_intel do
-      url "https://software.lynshen.org/cli/0.8.10/lynshen-x86_64-unknown-linux-gnu"
-      sha256 "11206800813a94d6e32206b75f1cfe175c66fa2f09b3002a3b7a95181f96db4c"
+      url "https://software.lynshen.org/cli/0.8.11/lynshen-x86_64-unknown-linux-gnu"
+      sha256 "08d3d12b21defd620513a598f1132f3017c3ec6e72b01ff36582014a205cc425"
     end
   end
 
