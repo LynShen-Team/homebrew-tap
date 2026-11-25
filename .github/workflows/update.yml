@@ -1,0 +1,87 @@
+name: Update formula
+
+# Keeps Formula/lynshen.rb on the newest LynShen CLI release in the software
+# library. The CLI release runs this right after it publishes
+# (`gh workflow run update.yml -R LynShen-Team/homebrew-tap`); the hourly run
+# catches anything missed. A new version is installed with brew on macOS and
+# Linux before it is pushed.
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.render.outputs.changed }}
+      version: ${{ steps.render.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: render
+        run: |
+          version=$(python3 scripts/update_formula.py)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "formula already at $version"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: formula
+          path: Formula/lynshen.rb
+
+  test:
+    needs: render
+    # A push tests what was pushed; a scheduled run only a new version.
+    if: needs.render.outputs.changed == 'true' || github.event_name != 'schedule'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: formula
+          path: Formula
+      - name: brew install
+        shell: bash
+        run: |
+          eval "$(/opt/homebrew/bin/brew shellenv 2>/dev/null || /home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          # A local tap holding the formula as rendered.
+          tap="$(brew --repository)/Library/Taps/lynshen-team/homebrew-tap"
+          mkdir -p "$tap/Formula"
+          cp Formula/lynshen.rb "$tap/Formula/"
+          brew install lynshen-team/tap/lynshen
+          lynshen --version
+          brew test lynshen-team/tap/lynshen
+          brew style lynshen-team/tap/lynshen
+
+  push:
+    needs: [render, test]
+    if: needs.render.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: formula
+          path: Formula
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "lynshen ${{ needs.render.outputs.version }}"
+          git push
